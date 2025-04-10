@@ -1,0 +1,41 @@
+services:
+  backend:
+    image: elverovski/assetra-backend:v1
+    depends_on:
+      - mariadb
+    build:
+      context: ./ProjetFullStack-Backend
+    container_name: assetra-backend
+    networks:
+      - assetra-network
+    environment:
+      - SERVER_PORT=8585
+      - SPRING_DATASOURCE_URL=mariadb://mariadb:3306/assetra
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=123456
+  
+  frontend:
+    image: elverovski/assetra-frontend:v1
+    container_name: assetra-frontend
+    build:
+      context: ./ProjetFullStack-Frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - assetra-network
+  
+  mariadb:
+    image: mariadb
+    networks:
+      - assetra-network
+    volumes:
+      - ./ProjetFullStack-Backend/db-seed:/docker-entrypoint-initdb.d 
+    environment:
+      - MARIADB_DATABASE=assetra
+      - MARIADB_ROOT_PASSWORD=123456
+
+networks:
+  assetra-network:
+    driver: bridge
