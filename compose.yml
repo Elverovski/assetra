@@ -1,40 +1,55 @@
 services:
   backend:
     image: elverovski/assetra-backend:v1
-    depends_on:
-      - mariadb
     build:
       context: ./ProjetFullStack-Backend
     container_name: assetra-backend
+    ports:
+      - "8585:8585"
     networks:
       - assetra-network
+    depends_on:
+      mariadb:
+        condition: service_healthy
     environment:
       - SERVER_PORT=8585
-      - SPRING_DATASOURCE_URL=mariadb://mariadb:3306/assetra
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://mariadb:3306/assetra
       - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=123456
-  
+      - SPRING_DATASOURCE_PASSWORD=1234
+
   frontend:
     image: elverovski/assetra-frontend:v1
-    container_name: assetra-frontend
     build:
       context: ./ProjetFullStack-Frontend
+    container_name: assetra-frontend
     ports:
       - "80:80"
     depends_on:
       - backend
     networks:
       - assetra-network
-  
+
   mariadb:
     image: mariadb
+    container_name: mariadb
     networks:
       - assetra-network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 3
     volumes:
-      - ./ProjetFullStack-Backend/db-seed:/docker-entrypoint-initdb.d 
+      - db:/var/lib/mysql
+      - ./db-seed/data.sql:/docker-entrypoint-initdb.d/data.sql
     environment:
-      - MARIADB_DATABASE=assetra
-      - MARIADB_ROOT_PASSWORD=123456
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_DATABASE=assetra
+
+
+volumes:
+  db:
 
 networks:
   assetra-network:
