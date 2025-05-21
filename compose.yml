@@ -7,9 +7,11 @@ services:
     # ports:
     #   - "8585:8585"
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.backend.rule=Host(`backend.${MY_DOMAIN}`)'
-      - 'traefik.http.routers.backend.entryPoints=websecure'
+        - 'traefik.enable=true'
+        - 'traefik.http.routers.backend.rule=Host(`backend.${MY_DOMAIN}`)'
+        - 'traefik.http.routers.backend.entryPoints=websecure'
+        - "traefik.http.services.backend.loadbalancer.server.port=8585"
+        - "traefik.http.routers.backend.service=backend"
     networks:
       - cloud
     depends_on:
@@ -29,9 +31,11 @@ services:
     # ports:
     #   - "80:80"
     labels:
-    - 'traefik.enable=true'
-    - 'traefik.http.routers.frontend.rule=Host(`frontend.${MY_DOMAIN}`)'
-    - 'traefik.http.routers.frontend.entryPoints=websecure'
+        - 'traefik.enable=true'
+        - 'traefik.http.routers.frontend.rule=Host(`frontend.${MY_DOMAIN}`)'
+        - 'traefik.http.routers.frontend.entryPoints=websecure'
+        - "traefik.http.services.frontend.loadbalancer.server.port=80"
+        - "traefik.http.routers.frontend.service=frontend"
     depends_on:
       - backend
     networks:
@@ -82,9 +86,11 @@ services:
     # ports:
     #   - "8096:8096"
     labels:
-    - 'traefik.enable=true'
-    - 'traefik.http.routers.jellyfin.rule=Host(`jellyfin.${MY_DOMAIN}`)'
-    - 'traefik.http.routers.jellyfin.entryPoints=websecure'
+        - 'traefik.enable=true'
+        - 'traefik.http.routers.jellyfin.rule=Host(`jellyfin.${MY_DOMAIN}`)'
+        - 'traefik.http.routers.jellyfin.entryPoints=websecure'
+        - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
+        - "traefik.http.routers.jellyfin.service=jellyfin"
     environment:
       - TZ=America/Montreal
     volumes:
