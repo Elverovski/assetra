@@ -8,8 +8,8 @@ services:
     #   - "8585:8585"
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.portainer.rule=Host(`backend.${MY_DOMAIN}`)'
-      - 'traefik.http.routers.portainer.entryPoints=websecure'
+      - 'traefik.http.routers.backend.rule=Host(`backend.${MY_DOMAIN}`)'
+      - 'traefik.http.routers.backend.entryPoints=websecure'
     networks:
       - cloud
     depends_on:
@@ -30,8 +30,8 @@ services:
     #   - "80:80"
     labels:
     - 'traefik.enable=true'
-    - 'traefik.http.routers.portainer.rule=Host(`frontend.${MY_DOMAIN}`)'
-    - 'traefik.http.routers.portainer.entryPoints=websecure'
+    - 'traefik.http.routers.frontend.rule=Host(`frontend.${MY_DOMAIN}`)'
+    - 'traefik.http.routers.frontend.entryPoints=websecure'
     depends_on:
       - backend
     networks:
@@ -64,9 +64,11 @@ services:
     # ports:
     #   - "9000:9000"
     labels:
-    - 'traefik.enable=true'
-    - 'traefik.http.routers.portainer.rule=Host(`portainer.${MY_DOMAIN}`)'
-    - 'traefik.http.routers.portainer.entryPoints=websecure'
+        - 'traefik.enable=true'
+        - 'traefik.http.routers.portainer.rule=Host(`portainer.${MY_DOMAIN}`)'
+        - 'traefik.http.routers.portainer.entryPoints=websecure'
+        - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+        - "traefik.http.routers.portainer.service=portainer"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
