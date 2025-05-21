@@ -84,44 +84,44 @@ services:
       - /mnt/media/Movies:/movies
       - /mnt/media/TV:/tv
 
-    proxy:
-      image: traefik
-      container_name: traefik
-      restart: unless-stopped
-      networks: 
-          - cloud
-      command:
-        - "--log.level=DEBUG"
-        - "--api.insecure=true"
-        - "--providers.docker=true"
-        - "--providers.docker.exposedbydefault=false"
-        - "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
-        - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=duckdns"
-        - "--certificatesresolvers.letsencrypt.acme.email=mail@mail.com"
-        - "--certificatesresolvers.letsencrypt.acme.dnschallenge.disablePropagationCheck=true"
-        - "--certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53"
-        - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
-        - "--entrypoints.web.address=:80"
-        - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-        - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-        - "--entrypoints.websecure.address=:443"
-        - "--entrypoints.websecure.http.tls=true"
-        - "--entrypoints.websecure.http.tls.certResolver=letsencrypt"
-        - "--entrypoints.websecure.http.tls.domains[0].main=${MY_DOMAIN}"
-        - "--entrypoints.websecure.http.tls.domains[0].sans=*.${MY_DOMAIN}"
-      volumes:
-        - "../data/traefik/letsencrypt:/letsencrypt"
-        - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      labels:
-        - 'traefik.enable=true'
-        - 'traefik.http.routers.api.rule=Host(`${MY_DOMAIN}`)'
-        - 'traefik.http.routers.api.entryPoints=websecure'
-        - 'traefik.http.routers.api.service=api@internal'
-      ports:
-        - "443:443"
-        - "80:80"
-      environment:
-        - "DUCKDNS_TOKEN=${DUCKDNS_TOKEN}"
+  proxy:
+    image: traefik
+    container_name: traefik
+    restart: unless-stopped
+    networks: 
+        - cloud
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=duckdns"
+      - "--certificatesresolvers.letsencrypt.acme.email=mail@mail.com"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.disablePropagationCheck=true"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.http.tls=true"
+      - "--entrypoints.websecure.http.tls.certResolver=letsencrypt"
+      - "--entrypoints.websecure.http.tls.domains[0].main=${MY_DOMAIN}"
+      - "--entrypoints.websecure.http.tls.domains[0].sans=*.${MY_DOMAIN}"
+    volumes:
+      - "../data/traefik/letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.api.rule=Host(`${MY_DOMAIN}`)'
+      - 'traefik.http.routers.api.entryPoints=websecure'
+      - 'traefik.http.routers.api.service=api@internal'
+    ports:
+      - "443:443"
+      - "80:80"
+    environment:
+      - "DUCKDNS_TOKEN=${DUCKDNS_TOKEN}"
 
 volumes:
   portainer_data:
