@@ -4,8 +4,12 @@ services:
     build:
       context: ./ProjetFullStack-Backend
     container_name: assetra-backend
-    ports:
-      - "8585:8585"
+    # ports:
+    #   - "8585:8585"
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.portainer.rule=Host(`backend.${MY_DOMAIN}`)'
+      - 'traefik.http.routers.portainer.entryPoints=websecure'
     networks:
       - cloud
     depends_on:
@@ -22,8 +26,12 @@ services:
     build:
       context: ./ProjetFullStack-Frontend
     container_name: assetra-frontend
-    ports:
-      - "80:80"
+    # ports:
+    #   - "80:80"
+    labels:
+    - 'traefik.enable=true'
+    - 'traefik.http.routers.portainer.rule=Host(`frontend.${MY_DOMAIN}`)'
+    - 'traefik.http.routers.portainer.entryPoints=websecure'
     depends_on:
       - backend
     networks:
@@ -59,8 +67,6 @@ services:
     - 'traefik.enable=true'
     - 'traefik.http.routers.portainer.rule=Host(`portainer.${MY_DOMAIN}`)'
     - 'traefik.http.routers.portainer.entryPoints=websecure'
-    - "traefik.http.services.frontend.loadbalancer.server.port=9000"
-    - "traefik.http.routers.frontend.service=frontend"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
