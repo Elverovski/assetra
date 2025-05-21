@@ -7,7 +7,7 @@ services:
     ports:
       - "8585:8585"
     networks:
-      - assetra-network
+      - cloud
     depends_on:
       mariadb:
         condition: service_healthy
@@ -27,13 +27,13 @@ services:
     depends_on:
       - backend
     networks:
-      - assetra-network
+      - cloud
 
   mariadb:
     image: mariadb
     container_name: mariadb
     networks:
-      - assetra-network
+      - cloud
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       start_period: 5s
@@ -46,11 +46,39 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=1234
       - MYSQL_DATABASE=assetra
+      
+  portainer:
+    image: portainer/portainer-ce:alpine
+    container_name: portainer
+    restart: unless-stopped
+    networks: 
+        - cloud
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
 
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    networks: 
+      - cloud
+    ports:
+      - "8096:8096"
+    environment:
+      - TZ=America/Montreal
+    volumes:
+      - jellyfin_data:/config
+      - /mnt/media/Movies:/movies
+      - /mnt/media/TV:/tv
 
 volumes:
+  portainer_data:
   db:
+  jellyfin_data:
 
 networks:
-  assetra-network:
-    driver: bridge
+  cloud: 
+      driver: bridge
